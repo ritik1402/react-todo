@@ -1,12 +1,32 @@
-import React, { useState } from "react";
+import React, { useState,useEffect, useRef } from "react";
 import { motion } from "motion/react";
-
 
 const ToDo = () => {
   const [tasks, setTasks] = useState("");
   const [ToDo, setToDo] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
   const [editedText, setEditedText] = useState("");
+
+  const  isFirstRender = useRef(true)
+
+
+
+  useEffect(()=>{
+   
+    const savedTask = localStorage.getItem("todo-tasks");
+    if(savedTask){
+      setToDo(JSON.parse(savedTask));
+    }
+
+  },[])
+
+  useEffect(()=>{
+     if(isFirstRender.current){
+      isFirstRender.current = false;
+      return;
+    }
+    localStorage.setItem("todo-tasks", JSON.stringify(ToDo));
+  },[ToDo])
 
   const addTask = () => {
     if (tasks.trim() === "") return;
@@ -84,7 +104,7 @@ const ToDo = () => {
           </h2>
           <div>
             {ToDo.map((item, index) => (
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-4 bg-gray-100 px-4 py-2 rounded">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mb-4 bg-gray-100 px-4 py-2 rounded" key={index}>
                 {editIndex === index ? (
                   <>
                     <input
@@ -119,6 +139,7 @@ const ToDo = () => {
                           visible: { opacity: 1, x: 0 },
                         }}
                         className="list-none text-lg"
+                        key={index}
                       >
                         {item}
                       </motion.li>
